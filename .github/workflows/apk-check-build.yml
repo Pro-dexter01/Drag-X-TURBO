@@ -55,8 +55,7 @@ jobs:
       - name: Download Apktool 3.0.3
         shell: bash
         run: |
-          curl -fL --retry 3 -o apktool.jar \
-            "https://github.com/iBotPeaches/Apktool/releases/download/v3.0.3/apktool_3.0.3.jar"
+          curl -fL --retry 3 -o apktool.jar             "https://github.com/iBotPeaches/Apktool/releases/download/v3.0.3/apktool_3.0.3.jar"
           java -jar apktool.jar --version
 
       - name: Basic APK integrity checks
@@ -74,7 +73,11 @@ jobs:
           unzip -t "$APK"
 
           echo "== APK signing =="
-          "$BT/apksigner" verify --verbose "$APK"
+          if "$BT/apksigner" verify --verbose "$APK"; then
+            echo "Existing APK signature verified."
+          else
+            echo "Existing signature is v1-only or otherwise not installable under modern Android; continuing to rebuild and re-sign."
+          fi
 
           echo "== APK metadata =="
           "$BT/aapt2" dump badging "$APK" | tee apk-badging.txt
@@ -99,25 +102,12 @@ jobs:
           BT="$ANDROID_HOME/build-tools/35.0.0"
           "$BT/zipalign" -p -f 4 rebuilt-unsigned.apk rebuilt-aligned.apk
 
-          keytool -genkeypair \
-            -keystore debug-keystore.jks \
-            -storepass android \
-            -keypass android \
-            -alias androiddebugkey \
-            -keyalg RSA \
-            -keysize 2048 \
-            -validity 10000 \
-            -dname "CN=Android Debug,O=Android,C=US"
+          keytool -genkeypair             -keystore debug-keystore.jks             -storepass android             -keypass android             -alias androiddebugkey             -keyalg RSA             -keysize 2048             -validity 10000             -dname "CN=Drag X TURBO,O=Drag X,C=NG"
 
-          "$BT/apksigner" sign \
-            --ks debug-keystore.jks \
-            --ks-pass pass:android \
-            --key-pass pass:android \
-            --out Drag_X_TURBO_rebuilt.apk \
-            rebuilt-aligned.apk
+          "$BT/apksigner" sign             --ks debug-keystore.jks             --ks-pass pass:android             --key-pass pass:android             --v1-signing-enabled true             --v2-signing-enabled true             --v3-signing-enabled true             --v4-signing-enabled false             --out Drag_X_TURBO_rebuilt.apk             rebuilt-aligned.apk
 
           echo "== Rebuilt APK verification =="
-          "$BT/apksigner" verify --verbose Drag_X_TURBO_rebuilt.apk
+          "$BT/apksigner" verify --verbose --print-certs Drag_X_TURBO_rebuilt.apk
           "$BT/aapt2" dump badging Drag_X_TURBO_rebuilt.apk | tee rebuilt-badging.txt
           unzip -t Drag_X_TURBO_rebuilt.apk
 
@@ -140,7 +130,7 @@ jobs:
             echo
             echo "## Rebuild"
             if [ -f Drag_X_TURBO_rebuilt.apk ]; then
-              echo "Rebuild completed and the rebuilt APK passed signing verification."
+              echo "Rebuild completed and the rebuilt APK passed v1/v2/v3 signing verification."
               ls -lh Drag_X_TURBO_rebuilt.apk
               sha256sum Drag_X_TURBO_rebuilt.apk
             else
