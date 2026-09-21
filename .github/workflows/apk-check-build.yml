@@ -1,0 +1,162 @@
+name: Drag X TURBO APK Check & Build
+
+on:
+  push:
+    paths:
+      - "*.apk"
+      - ".github/workflows/apk-check-build.yml"
+  workflow_dispatch:
+    inputs:
+      rebuild:
+        description: "Decode and rebuild the APK with Apktool"
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  apk-check-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download repository
+        uses: actions/checkout@v5
+
+      - name: Find APK
+        id: apk
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK="$(find . -maxdepth 2 -type f -name '*.apk' | head -n 1)"
+          if [ -z "$APK" ]; then
+            echo "No APK found in the repository."
+            exit 1
+          fi
+          echo "path=$APK" >> "$GITHUB_OUTPUT"
+          echo "APK: $APK"
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android build tools
+        shell: bash
+        run: |
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager "platform-tools" "build-tools;35.0.0"
+
+      - name: Download Apktool 3.0.3
+        shell: bash
+        run: |
+          curl -fL --retry 3 -o apktool.jar \
+            "https://github.com/iBotPeaches/Apktool/releases/download/v3.0.3/apktool_3.0.3.jar"
+          java -jar apktool.jar --version
+
+      - name: Basic APK integrity checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK="${{ steps.apk.outputs.path }}"
+          BT="$ANDROID_HOME/build-tools/35.0.0"
+
+          echo "== File =="
+          ls -lh "$APK"
+          sha256sum "$APK"
+
+          echo "== ZIP/APK integrity =="
+          unzip -t "$APK"
+
+          echo "== APK signing =="
+          "$BT/apksigner" verify --verbose "$APK"
+
+          echo "== APK metadata =="
+          "$BT/aapt2" dump badging "$APK" | tee apk-badging.txt
+
+          echo "== DEX files =="
+          unzip -l "$APK" | grep -E '(^|/)classes[0-9]*\.dex$' || true
+
+          echo "== Native libraries =="
+          unzip -l "$APK" | grep -E 'lib/[^/]+/.*\.so$' || true
+
+      - name: Decode and rebuild with Apktool
+        if: github.event_name == 'push' || inputs.rebuild == true
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK="${{ steps.apk.outputs.path }}"
+
+          rm -rf decoded rebuilt
+          java -jar apktool.jar d "$APK" -o decoded --force
+          java -jar apktool.jar b decoded -o rebuilt-unsigned.apk
+
+          BT="$ANDROID_HOME/build-tools/35.0.0"
+          "$BT/zipalign" -p -f 4 rebuilt-unsigned.apk rebuilt-aligned.apk
+
+          keytool -genkeypair \
+            -keystore debug-keystore.jks \
+            -storepass android \
+            -keypass android \
+            -alias androiddebugkey \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -dname "CN=Android Debug,O=Android,C=US"
+
+          "$BT/apksigner" sign \
+            --ks debug-keystore.jks \
+            --ks-pass pass:android \
+            --key-pass pass:android \
+            --out Drag_X_TURBO_rebuilt.apk \
+            rebuilt-aligned.apk
+
+          echo "== Rebuilt APK verification =="
+          "$BT/apksigner" verify --verbose Drag_X_TURBO_rebuilt.apk
+          "$BT/aapt2" dump badging Drag_X_TURBO_rebuilt.apk | tee rebuilt-badging.txt
+          unzip -t Drag_X_TURBO_rebuilt.apk
+
+      - name: Create check report
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo "# Drag X TURBO APK check"
+            echo
+            echo "Commit: $GITHUB_SHA"
+            echo
+            echo "## Original APK"
+            echo "File and SHA-256:"
+            ls -lh "${{ steps.apk.outputs.path }}" || true
+            sha256sum "${{ steps.apk.outputs.path }}" || true
+            echo
+            echo "## Original badging"
+            cat apk-badging.txt 2>/dev/null || true
+            echo
+            echo "## Rebuild"
+            if [ -f Drag_X_TURBO_rebuilt.apk ]; then
+              echo "Rebuild completed and the rebuilt APK passed signing verification."
+              ls -lh Drag_X_TURBO_rebuilt.apk
+              sha256sum Drag_X_TURBO_rebuilt.apk
+            else
+              echo "No rebuilt APK was produced. Check the workflow logs for the exact failure."
+            fi
+          } > apk-check-report.md
+
+      - name: Upload APK check artifacts
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: drag-x-turbo-apk-check
+          path: |
+            apk-check-report.md
+            apk-badging.txt
+            rebuilt-badging.txt
+            Drag_X_TURBO_rebuilt.apk
+          if-no-files-found: ignore
+          retention-days: 14
