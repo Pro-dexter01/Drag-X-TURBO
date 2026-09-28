@@ -1,0 +1,9 @@
+id=dragx_turbo
+name=Drag X TURBO
+version=0.4.0
+versionCode=400
+author=Drag X
+maintainer=Drag X
+license=GPL-3.0
+description=Drag X TURBO unified Android game assistant with hardware-aware display controls, game prefetch, cache maintenance, GMS maintenance, SurfaceFlinger telemetry and central dragxctl control.
+axeronPlugin=>=13000
