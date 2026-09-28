@@ -22,6 +22,15 @@ jobs:
           set -euo pipefail
           mkdir -p dist
           rm -f "dist/Drag X TURBO 0.4.0.zip"
+
+          test -x system/bin/dragxctl
+          for payload in GAP32 GAP64 vmtouch32 vmtouch64; do
+            test -x "system/bin/$payload"
+          done
+
+          test -f backend/components/prefetch/game-db/gamelist.txt.gz.b64
+          base64 -d backend/components/prefetch/game-db/gamelist.txt.gz.b64 | gzip -d > backend/components/prefetch/game-db/gamelist.txt
+          test -s backend/components/prefetch/game-db/gamelist.txt
           zip -qr "dist/Drag X TURBO 0.4.0.zip" . \
             -x '.git/*' 'dist/*' '.github/workflows/*'
           sha256sum "dist/Drag X TURBO 0.4.0.zip" > "dist/Drag X TURBO 0.4.0.zip.sha256"
