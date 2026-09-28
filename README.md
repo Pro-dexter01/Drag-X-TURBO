@@ -1,5 +1,7 @@
-# Drag-X-TURBO
+# Drag X TURBO
 
-APK validation and installable rebuild workflow enabled.
+Current milestone: **v0.4.0**
 
-<!-- rebuild trigger 2026-09-22 -->
+The repository tracks the Drag X TURBO project and its validation/rebuild history.
+
+See `PROJECT_STATE.md` for the current implementation state and verification requirements.
