@@ -1,20 +1,24 @@
 # Drag X TURBO 0.4.0 source integration
 
-The five supplied ZIPs are the source inputs for v0.4.0. They are preserved as release/source artifacts while their executable and resource components are integrated into the repository under the backend/component layout.
+The five supplied ZIPs are development/reference inputs for the 0.4.0 implementation.
 
 | Source | Integration role |
 |---|---|
-| Cache cleaner-VeuLexier [ AxM ] | cache-cleaner backend |
-| Celestial-Flinger-Flux-2.5 (12092026 release) | Flinger backend + telemetry |
-| Game-Asset-Prefetcher-1.6 (25082026 release) | asset-prefetch backend |
-| GMS-Optimizer (11082026 released) | GMS maintenance backend |
-| NexaCore @EnriqueBrach | AxManager/NexaCore integration reference and web/backend resources |
+| Cache cleaner-VeuLexier [ AxM ] | cache/memory behavior reference |
+| Celestial-Flinger-Flux-2.5 (12092026 release) | Flinger/display telemetry reference |
+| Game-Asset-Prefetcher-1.6 (25082026 release) | asset-prefetch behavior and native payload reference |
+| GMS-Optimizer (11082026 released) | GMS maintenance behavior reference |
+| NexaCore @EnriqueBrach | AxManager/NexaCore integration and orchestration reference |
 
-## Packaging rule
+## Runtime rule
 
-The release package must contain the actual integrated executable/resource payloads. A wrapper that merely points at an external ZIP is not considered a complete payload.
+The source ZIPs are not runtime dependencies and are not executed by Drag X TURBO.
 
-Decorative source-only assets may be deduplicated when packaging, but executable files, scripts, configuration, game lists and required web/resources must remain available to the module.
+Useful, permitted behavior is adapted into the repository's own component boundaries. Executable/resource payloads required by the final module must be integrated into the repository in later implementation steps rather than referenced from an external ZIP.
+
+## Step 3A status
+
+Step 3A establishes the component structure and shared capability/safety/result conventions. Native payload integration begins in Step 3B.
 
 ## Release naming
 
