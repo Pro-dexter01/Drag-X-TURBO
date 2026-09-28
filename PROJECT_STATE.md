@@ -27,3 +27,8 @@ Display verification requirement:
 Refresh rate and game FPS remain separate: display mode is the physical panel mode; game FPS target is the application/render target; active FPS is measured/live telemetry when available.
 
 Important: the existing architecture/design must not be removed when adding features.
+
+
+## 0.4.0 packaging correction
+
+The repository is the persistent source of truth. The five supplied source ZIPs are inputs to the repository integration and to the release distribution. v0.4.0 must package real executable/resource payloads inside the assembled module; tiny wrappers that depend on external ZIPs are not acceptable. The GitHub Release artifact is `Drag X TURBO 0.4.0.zip`. A packaging workflow is present at `.github/workflows/package-release.yml` and produces the ZIP plus SHA-256 checksum.
