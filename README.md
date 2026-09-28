@@ -2,6 +2,8 @@
 
 Current milestone: **v0.4.0**
 
-The repository tracks the Drag X TURBO project and its validation/rebuild history.
+Drag X TURBO is the standalone AxManager/NexaCore-compatible game-assistant module.
 
-See `PROJECT_STATE.md` for the current implementation state and verification requirements.
+The supplied Celestial Flinger Flux, Game Asset Prefetcher, VeuLexier Cache Cleaner, GMS Optimizer and NexaCore packages are **development source references**. Their useful behaviors are adapted into TURBO; the five source ZIPs are not runtime dependencies.
+
+See `PROJECT_STATE.md` and `docs/INTEGRATED_FEATURES.md` for the current architecture and integration contract.
