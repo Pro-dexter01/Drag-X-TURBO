@@ -1,6 +1,6 @@
-# Drag X TURBO plugin update bundle
+# Drag X TURBO development source references
 
-The following supplied plugin ZIP updates are the source artifacts for the TURBO integration:
+The following supplied ZIPs are development/reference inputs used to adapt functionality into the standalone TURBO module. They are not runtime dependencies and should not be shipped as separate TURBO components.
 
 | Plugin | ZIP | SHA-256 |
 |---|---|---|
