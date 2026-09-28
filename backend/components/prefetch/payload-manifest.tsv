@@ -1,0 +1,5 @@
+# name	abi	sha256	minimum_android	role
+GAP32	armeabi-v7a	0464adac4a65b00e31de7fab33c0cc5426a7335f28d3941f37ac12314478c753	28	game-asset-prefetch
+GAP64	arm64-v8a	cb64fcc3742cb5534605189a1d1e5309294cfd2825ce206581ad745eb11be488	28	game-asset-prefetch
+vmtouch32	armeabi-v7a	a73edcc661e59b169e99f52a08e8d8b26c78beeb7c69ff0bf1d1675fbc7c392f	24	filesystem-cache-touch
+vmtouch64	arm64-v8a	05caac082fcfa1d6b5702f1128d3c9ada04e4e9acdbac83e1297d4ab6edfa850	24	filesystem-cache-touch
