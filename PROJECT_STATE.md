@@ -42,3 +42,12 @@ Next: Step 3B native payload layer — GAP32/GAP64, vmtouch32/vmtouch64, game da
 ## 0.4.0 packaging correction
 
 The repository is the persistent source of truth. The five supplied source ZIPs are inputs to the repository integration and to the release distribution. v0.4.0 must package real executable/resource payloads inside the assembled module; tiny wrappers that depend on external ZIPs are not acceptable. The GitHub Release artifact is `Drag X TURBO 0.4.0.zip`. A packaging workflow is present at `.github/workflows/package-release.yml` and produces the ZIP plus SHA-256 checksum.
+
+## Step 3B — native payload layer
+
+In progress on branch step-3b-native-payloads:
+- Added the native payload manifest with source SHA-256 values and Android/ABI requirements.
+- Added strict ABI selection and payload integrity verification logic.
+- Added the source game database as a repository resource plus materialization helper.
+- The four ELF payload objects still need to be committed through a binary-capable repository upload path; the current GitHub text-file connector cannot safely upload them as executable blobs.
+- No 0.4.0 release/package is considered complete until the real GAP32/GAP64/vmtouch32/vmtouch64 files are present and verified.
