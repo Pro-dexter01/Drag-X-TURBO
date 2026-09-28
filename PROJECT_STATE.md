@@ -29,6 +29,16 @@ Refresh rate and game FPS remain separate: display mode is the physical panel mo
 Important: the existing architecture/design must not be removed when adding features.
 
 
+## Step 3A — repository foundation
+
+Completed on 2026-09-28:
+- Added isolated backend component boundaries for display, Flinger, prefetch, cache, GMS, Game Profile and Turbo orchestration.
+- Added shared core/lib conventions for capability checks, safety classes and normalized command results.
+- Corrected source-integration documentation so the five ZIPs are clearly development/reference inputs, not runtime dependencies.
+- Kept native payload integration and deeper source-derived behavior for Steps 3B–3D.
+
+Next: Step 3B native payload layer — GAP32/GAP64, vmtouch32/vmtouch64, game database, ABI selection and payload integrity verification.
+
 ## 0.4.0 packaging correction
 
 The repository is the persistent source of truth. The five supplied source ZIPs are inputs to the repository integration and to the release distribution. v0.4.0 must package real executable/resource payloads inside the assembled module; tiny wrappers that depend on external ZIPs are not acceptable. The GitHub Release artifact is `Drag X TURBO 0.4.0.zip`. A packaging workflow is present at `.github/workflows/package-release.yml` and produces the ZIP plus SHA-256 checksum.
