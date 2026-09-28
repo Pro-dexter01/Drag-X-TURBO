@@ -18,3 +18,7 @@ Verification requirement for refresh rate:
 5. Fall back safely when the requested mode is unsupported.
 
 Important: the existing architecture/design must not be removed when adding features.
+
+## Hardware-aware Display & FPS implementation
+
+The `backend/display_hardware.sh` detector now provides Android-reported display modes and the active mode as separate data. `backend/README.md` defines the requested/supported/active contract and verification semantics, and `backend/test_display_hardware.sh` provides a parser regression fixture. The next UI/dragxctl integration must consume these results rather than maintain a hard-coded Hz list.
